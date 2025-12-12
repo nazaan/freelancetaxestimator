@@ -84,6 +84,9 @@ def calculate_tax_breakdown(gross_income, total_expenses, province_code):
     """
     Orchestrates the tax calculation process, including Net Income, CPP, and Total Tax.
     """
+    # --- STEP 0.1: Apply Rounding to Primary Inputs (FIX HERE) ---
+    gross_income = round(gross_income, 2)
+    total_deductible_expenses = round(total_deductible_expenses, 2)
     
     # 1. Calculate Net Business Income (Used as the Taxable Income Base)
     net_income = max(0, gross_income - total_expenses)
