@@ -59,6 +59,46 @@ with st.sidebar:
         index=default_index, # Use the safely determined index
         key='province_select'
     )
+
+    # --- 1. SALES TAX SECTION (GST/HST/QST) ---
+st.sidebar.markdown("---")
+st.sidebar.subheader("Sales Tax (GST/HST)")
+
+# Checkbox for GST/HST registration (small supplier threshold is $30,000)
+is_gst_registered = st.sidebar.checkbox(
+    "Are you registered for GST/HST/QST?",
+    help="You must register if your gross revenue exceeds $30,000 in a single calendar quarter or over the last four consecutive calendar quarters."
+)
+
+if is_gst_registered:
+    # Get the combined Federal and Provincial Sales Tax Rate
+    # Note: This is an *oversimplification* as GST/HST/QST rates vary wildly by province.
+    # We will assume a simple combined rate for the sake of the estimator.
+    
+    # Common Canadian Combined Sales Tax Rates (e.g., HST/GST+PST)
+    if province_code in ['ON', 'NB', 'NL', 'NS', 'PE']:
+        # HST Provinces (13% or 15%)
+        hst_rate = 0.13 if province_code == 'ON' else 0.15 
+    elif province_code == 'QC':
+        # QST + GST
+        hst_rate = 0.14975 # approx 5% GST + 9.975% QST
+    else:
+        # GST + PST provinces (varies, using a common rate for estimate)
+        hst_rate = 0.12 # e.g. 5% GST + 7% PST/RST
+    
+    # Calculate Sales Tax Payable (Gross Income * Rate)
+    # This assumes the user is on the regular method and passes all sales tax through.
+    estimated_sales_tax_payable = gross_income * hst_rate
+    
+    st.session_state.hst_payable = estimated_sales_tax_payable
+    st.session_state.hst_rate = hst_rate * 100
+    
+else:
+    # Add a strong warning for the user if they're not registered.
+    st.sidebar.warning("🚨 Remember: If your annual sales exceed $30,000, you **must** register for and charge sales tax (GST/HST/QST) on your services.")
+    st.session_state.hst_payable = 0
+    st.session_state.hst_rate = 0
+
     
     # 2. Income Input (Gross Income)
     st.subheader("Gross Income")
@@ -135,6 +175,18 @@ if gross_income >= 0 and province_code and total_deductible_expenses >= 0:
     try:
         # Pass the calculated total deductible expenses to the tax function
         results = calculate_tax_breakdown(gross_income, total_deductible_expenses, province_code)
+
+
+# Display Sales Tax (Point 1)
+if st.session_state.hst_payable > 0:
+    st.subheader("Sales Tax (GST/HST/QST) Estimate")
+    st.markdown(f"**Assumed Rate:** {st.session_state.hst_rate:.2f}%")
+    st.metric(
+        label="Estimated Sales Tax Payable (Remittance)",
+        value=f"**{st.session_state.hst_payable:,.2f}** {CURRENCY}",
+        help="This is the estimated total sales tax you must collect from clients and remit to the government (e.g., HST in Ontario). This amount is NOT part of your income or expense deduction."
+    )
+    st.markdown("---")
         
         st.header("💰 Tax & Contribution Summary")
 
