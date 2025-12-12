@@ -18,17 +18,20 @@ if 'expense_list' not in st.session_state:
 
 # --- HELPER FUNCTION ---
 def add_expense(amount, category, date, description):
-    """Appends a new expense to the session state list."""
+    """Appends a new expense to the session state list, ensuring amounts are rounded."""
     # Ensure Meal & Entertainment is flagged for 50% deduction later
     is_50_percent = "Meals_and_Entertainment" in category
+    
+    # Calculate and round the deductible amount immediately
+    deductible_amount = round(amount * (0.5 if is_50_percent else 1.0), 2)
     
     st.session_state.expense_list.append({
         'Date': date,
         'Category_Code': category,
         'Category_Name': EXPENSE_CATEGORIES.get(category, "Other"),
         'Description': description,
-        'Amount': amount,
-        'Deductible_Amount': amount * (0.5 if is_50_percent else 1.0)
+        'Amount': round(amount, 2), # Also round the gross amount
+        'Deductible_Amount': deductible_amount
     })
 
 # --- TITLE AND INTRODUCTION ---
