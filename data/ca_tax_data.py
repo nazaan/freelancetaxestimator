@@ -10,10 +10,10 @@ FEDERAL_TAX_BRACKETS = [
     (float('inf'), 0.33) # 33% on income over $253,414
 ]
 
-# 2. Provincial Income Tax Brackets (Taxable Income) - Major Provinces
 # Key: 'AB' = Alberta, 'BC' = British Columbia, 'ON' = Ontario, 'QC' = Quebec
+# 2. Provincial Income Tax Brackets (Taxable Income) - All 13 Jurisdictions (2025)
 PROVINCIAL_TAX_BRACKETS = {
-    'AB': [ # Alberta (New 8% bracket for 2025)
+    'AB': [ # Alberta
         (60000, 0.08),
         (151234, 0.10),
         (181481, 0.12),
@@ -30,6 +30,46 @@ PROVINCIAL_TAX_BRACKETS = {
         (259829, 0.168),
         (float('inf'), 0.205)
     ],
+    'MB': [ # Manitoba
+        (47564, 0.108),
+        (101200, 0.1275),
+        (float('inf'), 0.174)
+    ],
+    'NB': [ # New Brunswick
+        (51306, 0.094),
+        (102614, 0.14),
+        (190060, 0.16),
+        (float('inf'), 0.195)
+    ],
+    'NL': [ # Newfoundland and Labrador
+        (44192, 0.087),
+        (88382, 0.145),
+        (157792, 0.158),
+        (220910, 0.178),
+        (282214, 0.198),
+        (564429, 0.208),
+        (1128858, 0.213),
+        (float('inf'), 0.218)
+    ],
+    'NS': [ # Nova Scotia
+        (30507, 0.0879),
+        (61015, 0.1495),
+        (95883, 0.1667),
+        (154650, 0.175),
+        (float('inf'), 0.21)
+    ],
+    'NT': [ # Northwest Territories
+        (51964, 0.059),
+        (103930, 0.086),
+        (168967, 0.122),
+        (float('inf'), 0.1405)
+    ],
+    'NU': [ # Nunavut
+        (54707, 0.04),
+        (109413, 0.07),
+        (177881, 0.09),
+        (float('inf'), 0.115)
+    ],
     'ON': [ # Ontario
         (52886, 0.0505),
         (105775, 0.0915),
@@ -37,13 +77,31 @@ PROVINCIAL_TAX_BRACKETS = {
         (220000, 0.1216),
         (float('inf'), 0.1316)
     ],
-    'QC': [ # Quebec (Note: Quebec handles its own QPP, we use CPP/QPP rates for simplicity)
+    'PE': [ # Prince Edward Island
+        (33328, 0.095),
+        (64656, 0.1347),
+        (105000, 0.166),
+        (140000, 0.1762),
+        (float('inf'), 0.19)
+    ],
+    'QC': [ # Quebec
         (53255, 0.14),
         (106495, 0.19),
         (129590, 0.24),
         (float('inf'), 0.2575)
+    ],
+    'SK': [ # Saskatchewan
+        (53463, 0.105),
+        (152750, 0.125),
+        (float('inf'), 0.145)
+    ],
+    'YT': [ # Yukon
+        (57375, 0.064),
+        (114750, 0.09),
+        (177882, 0.109),
+        (500000, 0.128),
+        (float('inf'), 0.15)
     ]
-    # NOTE: You can add more provinces (MB, SK, NB, NS, PE, NL, etc.) using the search results.
 }
 
 # 3. Basic Personal Amount (BPA) for Tax Credits (2025)
