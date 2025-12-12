@@ -186,7 +186,7 @@ if gross_income >= 0 and province_code and total_deductible_expenses >= 0:
             return val
 
       
-         st.dataframe(
+        st.dataframe(
             df.style.format({'Amount': format_currency}),
             hide_index=True,
             use_container_width=True,
