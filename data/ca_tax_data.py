@@ -47,13 +47,21 @@ PROVINCIAL_TAX_BRACKETS = {
 }
 
 # 3. Basic Personal Amount (BPA) for Tax Credits (2025)
-# This amount reduces Tax Payable (multiplied by the lowest tax rate).
 BASIC_PERSONAL_AMOUNT = {
     'FEDERAL': 16129,
     'AB': 22323,
-    'BC': 12399,  # This amount varies based on income for BC, simplified here.
+    'BC': 12399,
+    'MB': 16194,
+    'NB': 12891,
+    'NL': 10839,
+    'NS': 9419,
+    'NT': 15810,
+    'NU': 17788,
     'ON': 12747,
-    'QC': 18055
+    'PE': 12500,
+    'QC': 18055,
+    'SK': 18991,
+    'YT': 15000 # Simplified
 }
 
 # 4. Canada Pension Plan (CPP) for Self-Employed (2025)
@@ -67,14 +75,25 @@ CPP_DATA = {
     'SELF_EMPLOYED_RATE_CPP2': 0.08   # Combined self-employed rate on YAMPE band
 }
 
-# 5. Business Expense Categories (Simplified list from CRA Form T2125)
-EXPENSE_CATEGORIES = [
-    "Advertising",
-    "Meals and Entertainment (50%)",
-    "Motor Vehicle Expenses",
-    "Office Supplies",
-    "Home Office Expenses",
-    "Professional Fees",
-    "Insurance",
-    "Other"
-]
+# 5. Full Business Expense Categories (Based on CRA T2125, Part 4)
+# We use a dictionary to store expense line numbers (for later reference) and display names.
+EXPENSE_CATEGORIES = {
+    "8521_Advertising": "Advertising",
+    "8523_Meals_and_Entertainment": "Meals & Entertainment (50% rule applied in code)",
+    "8690_Insurance": "Insurance (Commercial/Business)",
+    "8710_Interest_Bank_Charges": "Interest & Bank Charges",
+    "8760_Business_Taxes_Licences_Dues": "Business Taxes, Licences, & Dues",
+    "8810_Office_Expenses": "Office Expenses (Pens, Paper, etc.)",
+    "8860_Professional_Fees": "Professional Fees (Legal, Accounting, Consulting)",
+    "8910_Rent": "Rent (Office space, equipment, etc.)",
+    "8960_Repairs_Maintenance": "Repairs and Maintenance (Minor/Current)",
+    "9060_Salaries_Wages_Benefits": "Salaries, Wages, and Benefits (Hired help)",
+    "9180_Property_Taxes": "Property Taxes (Business property only)",
+    "9200_Travel_Expenses": "Travel Expenses (Flights, Accommodation, etc.)",
+    "9220_Utilities": "Utilities (Excluding Home Office portion)",
+    "9224_Fuel_Costs": "Fuel Costs (Except Motor Vehicle)",
+    "9275_Delivery_Freight_Express": "Delivery, Freight, and Express",
+    "9281_Motor_Vehicle_Expenses": "Motor Vehicle Expenses (Total, use logs for calculation)",
+    "9945_Business_Use_of_Home": "Business-Use-of-Home Expenses", # Calculated separately on T2125
+    "9270_Other_Expenses": "Other Expenses (Must be itemized)"
+}
