@@ -185,10 +185,11 @@ if gross_income >= 0 and province_code and total_deductible_expenses >= 0:
                 return f"${val:,.2f}"
             return val
 
-        st.dataframe(
+       st.dataframe(
             df.style.format({'Amount': format_currency}),
             hide_index=True,
-            use_container_width=True
+            use_container_width=True,
+            height="content" # <-- This ensures the full table height is displayed
         )
 
     except ValueError as e:
