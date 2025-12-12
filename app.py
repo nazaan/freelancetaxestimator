@@ -196,5 +196,20 @@ if gross_income >= 0 and province_code and total_deductible_expenses >= 0:
     except ValueError as e:
         st.error(f"Calculation Error: {e}")
         st.warning("Please ensure your selected province is configured correctly in the tax data.")
+
+# --- LEGAL DISCLAIMER ---
+    st.divider()
+    st.info(
+    """
+    **⚠️ IMPORTANT DISCLAIMER: NOT LEGAL OR PROFESSIONAL TAX ADVICE**
+    
+    This **Freelance Income & Tax Estimator** is a planning tool based on *estimated* 2025 federal and provincial tax rates, CPP contributions, and public tax data. 
+    
+    * **Accuracy:** The calculations are estimates only and do not account for every complex tax situation (e.g., specific tax credits, provincial surtaxes, investments, capital gains, etc.). 
+    * **Professional Advice:** This tool is **not a substitute for the advice of a qualified, licensed professional**. You must consult with a **Chartered Professional Accountant (CPA)** or other licensed tax professional to ensure 100% accuracy and compliance with the Canada Revenue Agency (CRA) and Revenu Québec.
+    * **Use at your own risk.**
+    """
+)
+# --- END OF APP.PY ---
     
 # --- END OF APP.PY ---
