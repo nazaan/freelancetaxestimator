@@ -79,49 +79,88 @@ def calculate_cpp_self_employed(net_income):
         
     return round(total_cpp, 2)
 
-  
- # Update the function signature to match the call in app.py
+
+def get_marginal_rate(income, brackets):
+    """
+    Determines the marginal rate for a given income level and set of brackets.
+    This helper is required for Point 3 (Tax Rate Display).
+    """
+    marginal_rate = 0.0
+    
+    # Start checking from the highest threshold down for safety, or iterate normally.
+    # Iterating normally works fine since the brackets are sorted by threshold.
+    for threshold, rate in brackets:
+        # Check if the income falls into the current bracket
+        if income > threshold:
+            marginal_rate = rate
+        else:
+            # Once income falls below a threshold, the previous rate is the marginal rate.
+            # However, for simplicity and safety against float errors, we check if income is in the *previous* bracket.
+            # The current rate is the marginal rate if the income is within or exceeds the current threshold.
+            return rate # Return the rate of the current bracket or the next one if the income is below.
+
+    # If the income exceeds the highest threshold (last item in brackets), return the last rate.
+    # This assumes the last bracket threshold is float('inf').
+    return brackets[-1][1]
+
+
+# The main calculation function (fixed signature and added rate calculations)
 def calculate_tax_breakdown(gross_income, total_deductible_expenses, province_code):
     
-    # 1. Apply Rounding to Primary Inputs
-    # Now, 'total_deductible_expenses' is a recognized argument name.
+    # 1. Apply Rounding to Primary Inputs (Fix for UnboundLocalError)
     income_rounded = round(gross_income, 2)
     expenses_rounded = round(total_deductible_expenses, 2)
 
     # 2. Calculate Net Business Income (Used as the Taxable Income Base)
     net_income = max(0, income_rounded - expenses_rounded)
-    net_income = round(net_income, 2) # Ensure net income is also clean
+    net_income = round(net_income, 2)
     
     
-    # 2. Calculate CPP Contribution (mandatory for self-employed)
+    # 3. Calculate CPP Contribution (mandatory for self-employed)
     cpp_contribution = calculate_cpp_self_employed(net_income)
     
-    # ... (rest of the logic remains the same, using net_income, cpp_contribution, etc.)
-    
-    # 3. Determine the final Taxable Income for Income Tax (after deductions like CPP)
+    # 4. Determine the final Taxable Income for Income Tax (after deductions like CPP)
     # The self-employed can deduct 50% of the CPP contribution (employer portion)
     cpp_deduction = cpp_contribution * 0.5
     taxable_income = max(0, net_income - cpp_deduction)
     
-    # 4. Calculate Federal Tax
+    # 5. Calculate Federal Tax
     fed_bpa = BASIC_PERSONAL_AMOUNT['FEDERAL']
     federal_tax = calculate_marginal_tax(taxable_income, FEDERAL_TAX_BRACKETS, fed_bpa)
     
-    # 5. Calculate Provincial Tax
+    # 6. Calculate Provincial Tax
     provincial_brackets = PROVINCIAL_TAX_BRACKETS.get(province_code, [])
     if not provincial_brackets:
         raise ValueError("Invalid province code provided.")
 
-    prov_bpa = BASIC_PERSONAL_AMOUNT.get(province_code, 0) # Fallback to 0 if BPA not defined
+    prov_bpa = BASIC_PERSONAL_AMOUNT.get(province_code, 0)
     provincial_tax = calculate_marginal_tax(taxable_income, provincial_brackets, prov_bpa)
     
-    # 6. Summation
+    # 7. Summation
     total_income_tax = federal_tax + provincial_tax
-    total_estimated_tax_bill = total_income_tax + cpp_contribution
+    total_remittance = total_income_tax + cpp_contribution
     
-    # 7. Final estimated take-home pay
-    take_home_pay = net_income - total_estimated_tax_bill
+    # 8. Final estimated take-home pay
+    take_home_pay = net_income - total_remittance
+
+    # 9. --- NEW: Calculate Tax Rates (Point 3) ---
+    total_tax_paid = federal_tax + provincial_tax + cpp_contribution 
     
+    # Average (Effective) Tax Rate: Total tax paid divided by Net Income
+    if net_income > 0:
+        average_tax_rate = round((total_tax_paid / net_income) * 100, 2)
+    else:
+        average_tax_rate = 0.0
+
+    # Marginal Tax Rate: Rate of the highest bracket hit (Federal + Provincial)
+    # Note: CPP/QPP marginal contribution (4% CPP2 rate) is not included in the standard Marginal Income Tax Rate definition.
+    marginal_federal_rate = get_marginal_rate(taxable_income, FEDERAL_TAX_BRACKETS)
+    marginal_provincial_rate = get_marginal_rate(taxable_income, provincial_brackets)
+    
+    # Combine the rates and convert to a percentage
+    marginal_tax_rate = round((marginal_federal_rate + marginal_provincial_rate) * 100, 2)
+    
+
     return {
         'net_income': net_income,
         'cpp_contribution': cpp_contribution,
@@ -130,14 +169,16 @@ def calculate_tax_breakdown(gross_income, total_deductible_expenses, province_co
         'federal_tax': federal_tax,
         'provincial_tax': provincial_tax,
         'total_income_tax': total_income_tax,
-        'total_estimated_tax_bill': total_estimated_tax_bill,
-        'take_home_pay': take_home_pay
+        'total_remittance': total_remittance, # Renamed to avoid confusion with the app.py value
+        'take_home_pay': take_home_pay,
+        'total_tax_paid': total_tax_paid, 
+        'average_tax_rate': average_tax_rate,
+        'marginal_tax_rate': marginal_tax_rate
     }
-
 # Example usage (for testing purposes)
 # if __name__ == '__main__':
-#     # Test Case: Net income below YMPE
-#     test_result_on = calculate_tax_breakdown(gross_income=60000, total_expenses=10000, province_code='ON')
-#     print("--- Ontario Test Case (Net Income $50k) ---")
-#     for k, v in test_result_on.items():
-#         print(f"{k}: ${v:,.2f}")
+#   # Test Case: Net income $50,000 in Ontario
+#   test_result_on = calculate_tax_breakdown(gross_income=60000, total_deductible_expenses=10000, province_code='ON')
+#   print("--- Ontario Test Case (Net Income $50k) ---")
+#   for k, v in test_result_on.items():
+#       print(f"{k}: ${v:,.2f}")
