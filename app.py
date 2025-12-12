@@ -39,12 +39,21 @@ st.markdown("Track your income and get a detailed estimate of your Canadian inco
 with st.sidebar:
     st.header("👤 Your Profile & Summary")
     
-    # 1. Location Input (Dropdown with all 13 codes)
+   # 1. Location Input (Dropdown with all 13 codes)
+    province_options = list(PROVINCIAL_TAX_BRACKETS.keys())
+    
+    # Safely find the index of the default province ('ON')
+    default_province_code = 'ON'
+    try:
+        default_index = province_options.index(default_province_code)
+    except ValueError:
+        default_index = 0 # Default to the first element (AB) if 'ON' not found
+
     province_code = st.selectbox(
         "Select Your Province/Territory:",
-        options=list(PROVINCIAL_TAX_BRACKETS.keys()),
+        options=province_options,
         format_func=lambda x: f"{x} ({PROVINCIAL_TAX_BRACKETS[x][0][1]*100:.2f}% min rate)",
-        index=8, # Defaulting to ON for example
+        index=default_index, # Use the safely determined index
         key='province_select'
     )
     
