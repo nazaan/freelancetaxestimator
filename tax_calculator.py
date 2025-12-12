@@ -83,16 +83,24 @@ def calculate_cpp_self_employed(net_income):
 def calculate_tax_breakdown(gross_income, total_expenses, province_code):
     """
     Orchestrates the tax calculation process, including Net Income, CPP, and Total Tax.
-    """
-    # --- STEP 0.1: Apply Rounding to Primary Inputs (FIX HERE) ---
-    gross_income = round(gross_income, 2)
-    total_deductible_expenses = round(total_deductible_expenses, 2)
-    
+    """    
+    # FIX: Use new local variables for the rounded values
+    # This ensures Python does not confuse the arguments with unassigned local variables.
+    income_rounded = round(gross_income, 2)
+    expenses_rounded = round(total_deductible_expenses, 2)
+
     # 1. Calculate Net Business Income (Used as the Taxable Income Base)
-    net_income = max(0, gross_income - total_expenses)
+    net_income = max(0, income_rounded - expenses_rounded)
+    net_income = round(net_income, 2) # Ensure net income is also clean
+    
+    # ... (Now replace 'gross_income' with 'income_rounded' and 
+    # 'total_deductible_expenses' with 'expenses_rounded' throughout the rest of the function)
+    # ... 
     
     # 2. Calculate CPP Contribution (mandatory for self-employed)
     cpp_contribution = calculate_cpp_self_employed(net_income)
+    
+    # ... (rest of the logic remains the same, using net_income, cpp_contribution, etc.)
     
     # 3. Determine the final Taxable Income for Income Tax (after deductions like CPP)
     # The self-employed can deduct 50% of the CPP contribution (employer portion)
